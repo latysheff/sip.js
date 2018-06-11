@@ -1,6 +1,6 @@
 var crypto = require('crypto');
 var util = require('util');
-var stringifyUri = require('./sip').stringifyUri; 
+var stringifyUri = require('./sip').stringifyUri;
 
 function unq(a) {
   if(a && a[0] === '"' && a[a.length-1] === '"')
@@ -43,16 +43,16 @@ function calculateHA1(ctx) {
   var userhash = ctx.userhash || calculateUserRealmPasswordHash(ctx.user, ctx.realm, ctx.password);
   if(ctx.algorithm === 'md5-sess') return kd(userhash, ctx.nonce, ctx.cnonce);
 
-  return userhash; 
+  return userhash;
 }
 exports.calculateHA1 = calculateHA1;
 
 function calculateDigest(ctx) {
   switch(ctx.qop) {
-  case 'auth-int':
-    return kd(ctx.ha1, ctx.nonce, ctx.nc, ctx.cnonce, ctx.qop, kd(ctx.method, ctx.uri, kd(ctx.entity)));
-  case 'auth':
-    return kd(ctx.ha1, ctx.nonce, ctx.nc, ctx.cnonce, ctx.qop, kd(ctx.method, ctx.uri));
+    case 'auth-int':
+      return kd(ctx.ha1, ctx.nonce, ctx.nc, ctx.cnonce, ctx.qop, kd(ctx.method, ctx.uri, kd(ctx.entity)));
+    case 'auth':
+      return kd(ctx.ha1, ctx.nonce, ctx.nc, ctx.cnonce, ctx.qop, kd(ctx.method, ctx.uri));
   }
 
   return kd(ctx.ha1, ctx.nonce, kd(ctx.method, ctx.uri));
@@ -95,7 +95,7 @@ function selectQop(challenge, preference) {
   if(!preference)
     return challenge[0];
 
-  if(typeof(preference) === 'string') 
+  if(typeof(preference) === 'string')
     preference = preference.split(',');
 
   for(var i = 0; i !== preference.length; ++i)
@@ -140,14 +140,14 @@ exports.authenticateRequest = function(ctx, rq, creds) {
   var qop = unq(lowercase(response.qop));
 
   ctx.nc = (ctx.nc || 0) +1;
-  
+
   if(!ctx.ha1) {
     ctx.userhash = creds.hash || calculateUserRealmPasswordHash(creds.user, ctx.realm, creds.password);
     ctx.ha1 = ctx.userhash;
     if(ctx.algoritm === 'md5-sess')
       ctx.ha1 = kd(ctx.userhash, ctx.nonce, cnonce);
   }
-  
+
   var digest = calculateDigest({ha1:ctx.ha1, method:rq.method, nonce:ctx.nonce, nc:numberTo8Hex(ctx.nc), cnonce:cnonce, qop:qop, uri:uri, entity:rq.content});
   if(digest === unq(response.response)) {
     ctx.cnonce = cnonce;
@@ -155,7 +155,7 @@ exports.authenticateRequest = function(ctx, rq, creds) {
     ctx.qop = qop;
 
     return true;
-  } 
+  }
 
   return false;
 }
@@ -180,13 +180,13 @@ function initClientContext(ctx, rs, creds) {
   }
   else
     challenge = findDigestRealm(rs.headers['www-authenticate'], creds.realm);
-  
+
   if(ctx.nonce !== unq(challenge.nonce)) {
     ctx.nonce = unq(challenge.nonce);
 
     ctx.algorithm = unq(lowercase(challenge.algorithm));
     ctx.qop = selectQop(lowercase(challenge.qop), ctx.qop);
- 
+
     if(ctx.qop) {
       ctx.nc = 0;
       ctx.cnonce = rbytes();
@@ -201,7 +201,7 @@ function initClientContext(ctx, rs, creds) {
       ctx.ha1 = kd(ctx.ha1, ctx.nonce, ctx.cnonce);
 
     ctx.domain = unq(challenge.domain);
- }
+  }
 
   ctx.opaque = unq(challenge.opaque);
 }
@@ -214,23 +214,23 @@ exports.signRequest = function (ctx, rq, rs, creds) {
   var nc = ctx.nc !== undefined ? numberTo8Hex(++ctx.nc) : undefined;
 
   ctx.uri = stringifyUri(rq.uri);
-  
+
   var signature = {
     scheme: 'Digest',
     realm: q(ctx.realm),
     username: q(ctx.user),
-    nonce: q(ctx.nonce), 
+    nonce: q(ctx.nonce),
     uri: q(ctx.uri),
     nc: nc,
     algorithm: ctx.algorithm,
     cnonce: q(ctx.cnonce),
     qop: ctx.qop,
     opaque: q(ctx.opaque),
-    response: q(calculateDigest({ha1:ctx.ha1, method:rq.method, nonce:ctx.nonce, nc:nc, cnonce:ctx.cnonce, qop:ctx.qop, uri:ctx.uri, entity:rq.content}))    
+    response: q(calculateDigest({ha1:ctx.ha1, method:rq.method, nonce:ctx.nonce, nc:nc, cnonce:ctx.cnonce, qop:ctx.qop, uri:ctx.uri, entity:rq.content}))
   };
 
-  var hname = ctx.proxy ? 'proxy-authorization' : 'authorization'; 
- 
+  var hname = ctx.proxy ? 'proxy-authorization' : 'authorization';
+
   rq.headers[hname] = (rq.headers[hname] || []).filter(function(x) { return unq(x.realm) !== ctx.realm; });
   rq.headers[hname].push(signature);
 
@@ -249,13 +249,13 @@ exports.authenticateResponse = function(ctx, rs) {
       ctx.nonce = nextnonce;
       ctx.nc = 0;
 
-      if(ctx.algorithm === 'md5-sess') 
+      if(ctx.algorithm === 'md5-sess')
         ctx.ha1 = kd(ctx.userhash, ctx.nonce, ctx.cnonce);
     }
 
     return true;
   }
- 
+
   return false;
 }
 

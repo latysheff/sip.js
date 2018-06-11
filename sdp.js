@@ -34,42 +34,42 @@ var parsers = {
 
 exports.parse = function(sdp) {
   var sdp = sdp.split(/\r\n/);
-  
+
   var root = {};
   var m;
   root.m = [];
 
   for(var i = 0; i < sdp.length; ++i) {
     var tmp = /^(\w)=(.*)/.exec(sdp[i]);
-    
+
     if(tmp) {
 
-    var c = (parsers[tmp[1]] || function(x) { return x;})(tmp[2]);
-    switch(tmp[1]) {
-    case 'm':
-      if(m) root.m.push(m);
-      m = c;
-      break;
-    case 'a':
-      var o = (m || root);
-      if(o.a === undefined) o.a = [];
-      o.a.push(c);
-      break;
-    default:
-      (m || root)[tmp[1]] = c;
-      break;
-    }
+      var c = (parsers[tmp[1]] || function(x) { return x;})(tmp[2]);
+      switch(tmp[1]) {
+        case 'm':
+          if(m) root.m.push(m);
+          m = c;
+          break;
+        case 'a':
+          var o = (m || root);
+          if(o.a === undefined) o.a = [];
+          o.a.push(c);
+          break;
+        default:
+          (m || root)[tmp[1]] = c;
+          break;
+      }
     }
   }
 
   if(m) root.m.push(m);
-  
+
   return root;
 };
 
 var stringifiers = {
   o: function(o) {
-    return [o.username || '-', o.id, o.version, o.nettype || 'IN', o.addrtype || 'IP4', o.address].join(' '); 
+    return [o.username || '-', o.id, o.version, o.nettype || 'IN', o.addrtype || 'IP4', o.address].join(' ');
   },
   c: function(c) {
     return [c.nettype || 'IN', c.addrtype || 'IP4', c.address].join(' ');
@@ -96,7 +96,7 @@ function stringifyParam(sdp, type, def) {
 
 exports.stringify = function(sdp) {
   var s = '';
-  
+
   s += stringifyParam(sdp, 'v', 0);
   s +=  stringifyParam(sdp, 'o');
   s +=  stringifyParam(sdp, 's', '-');
