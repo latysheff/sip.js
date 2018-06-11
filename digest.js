@@ -82,6 +82,7 @@ function numberTo8Hex(n) {
   n = n.toString(16);
   return '00000000'.substr(n.length) + n;
 }
+exports.numberTo8Hex = numberTo8Hex;
 
 function findDigestRealm(headers, realm) {
   if(!realm) return headers && headers[0];
