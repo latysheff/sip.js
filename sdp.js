@@ -17,7 +17,7 @@ var parsers = {
     return { nettype: t[0], addrtype: t[1], address: t[2] };
   },
   m: function(m) {
-    var t = /^(\w+) +(\d+)(?:\/(\d))? +(\S+) (\d+( +\d+)*)/.exec(m);
+    var t = /^(\w+) +(\d+)(?:\/(\d))? +(\S+) (\*|\d+( +\d+)*)/.exec(m);
 
     return {
       media: t[1],
