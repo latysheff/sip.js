@@ -1,18 +1,19 @@
 var crypto = require('crypto');
-var util = require('util');
-var stringifyUri = require('./sip').stringifyUri; 
+var stringifyUri = require('./sip').stringifyUri;
 
 function unq(a) {
   if(a && a[0] === '"' && a[a.length-1] === '"')
     return a.substr(1, a.length - 2);
   return a;
 }
+exports.unq = unq;
 
 function q(a) {
   if(typeof a === 'string' && a[0] !== '"')
     return ['"', a, '"'].join('');
   return a;
 }
+exports.q = q;
 
 function lowercase(a) {
   if(typeof a === 'string')
@@ -86,6 +87,7 @@ function findDigestRealm(headers, realm) {
   if(!realm) return headers && headers[0];
   return headers && headers.filter(function(x) { return x.scheme.toLowerCase() === 'digest' && unq(x.realm) === realm; })[0];
 }
+exports.findDigestRealm = findDigestRealm;
 
 function selectQop(challenge, preference) {
   if(!challenge)

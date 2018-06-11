@@ -8,13 +8,6 @@ var os = require('os');
 var crypto = require('crypto');
 var WebSocket = require('uws');
 
-function debug(e) {
-  if(e.stack) {
-    util.debug(e + '\n' + e.stack);
-  }
-  else
-    util.debug(util.inspect(e));
-}
 
 function toBase64(s) { 
   switch(s.length % 3) {
