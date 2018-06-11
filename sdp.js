@@ -1,5 +1,3 @@
-var util = require('util');
-
 var parsers = {
   o: function(o) {
     var t = o.split(/\s+/);
