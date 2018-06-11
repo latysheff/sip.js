@@ -1,5 +1,4 @@
 var crypto = require('crypto');
-var util = require('util');
 var stringifyUri = require('./sip').stringifyUri;
 
 function unq(a) {
@@ -30,8 +29,8 @@ function kd() {
 }
 exports.kd = kd;
 
-function rbytes() {
-  return kd(Math.random().toString(), Math.random().toString());
+function rbytes(n) {
+  return crypto.randomBytes(n||16).toString('hex');
 }
 
 function calculateUserRealmPasswordHash(user, realm, password) {
@@ -189,7 +188,7 @@ function initClientContext(ctx, rs, creds) {
 
     if(ctx.qop) {
       ctx.nc = 0;
-      ctx.cnonce = rbytes();
+      ctx.cnonce = rbytes(8);
     }
 
     ctx.realm = unq(challenge.realm);
