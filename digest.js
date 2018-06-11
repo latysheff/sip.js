@@ -109,13 +109,18 @@ function selectQop(challenge, preference) {
   throw new Error('failed to negotiate protection quality');
 }
 
+var AlgorithmProperName = {
+  'md5': 'MD5',
+  'md5-sess': 'MD5-sess',
+};
+
 exports.challenge = function(ctx, rs) {
   ctx.proxy = rs.status === 407;
 
   ctx.nonce = ctx.nonce || rbytes();
   ctx.nc = 0;
   ctx.qop = ctx.qop || 'auth,auth-int';
-  ctx.algorithm = ctx.algorithm || 'MD5';
+  ctx.algorithm = ctx.algorithm || 'md5';
 
 
   var hname = ctx.proxy ? 'proxy-authenticate' : 'www-authenticate';
@@ -124,7 +129,7 @@ exports.challenge = function(ctx, rs) {
       scheme: 'Digest',
       realm: q(ctx.realm),
       qop: q(ctx.qop),
-      algorithm: ctx.algorithm,
+      algorithm: AlgorithmProperName[ctx.algorithm] || ctx.algorithm,
       nonce: q(ctx.nonce),
       opaque: q(ctx.opaque)
     }
@@ -231,7 +236,7 @@ exports.signRequest = function (ctx, rq, rs, creds) {
     nonce: q(ctx.nonce),
     uri: q(ctx.uri),
     nc: nc,
-    algorithm: ctx.algorithm,
+    algorithm: AlgorithmProperName[ctx.algorithm] || ctx.algorithm,
     cnonce: q(ctx.cnonce),
     qop: ctx.qop,
     opaque: q(ctx.opaque),
