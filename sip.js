@@ -218,6 +218,7 @@ function stringifyVersion(v) {
 function stringifyParams(params) {
   var s = '';
   for(var n in params) {
+    if (Array.isArray(params[n])) {params[n].forEach(p=>{s += ';'+n+"="+p})} else
     s += ';'+n+(params[n]?'='+params[n]:'');
   }
 
