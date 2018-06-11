@@ -184,6 +184,8 @@ function initClientContext(ctx, rs, creds) {
   else
     challenge = findDigestRealm(rs.headers['www-authenticate'], creds.realm);
 
+  if (!challenge) return;
+
   if(ctx.nonce !== unq(challenge.nonce)) {
     ctx.nonce = unq(challenge.nonce);
 
@@ -207,16 +209,20 @@ function initClientContext(ctx, rs, creds) {
   }
 
   ctx.opaque = unq(challenge.opaque);
+
+  return challenge;
 }
 
 exports.signRequest = function (ctx, rq, rs, creds) {
   ctx = ctx || {};
   if(rs)
-    initClientContext(ctx, rs, creds);
+    if (!initClientContext(ctx, rs, creds)) return;
 
   var nc = ctx.nc !== undefined ? numberTo8Hex(++ctx.nc) : undefined;
 
   ctx.uri = stringifyUri(rq.uri);
+
+  ctx.response = calculateDigest({ha1:ctx.ha1, method:rq.method, nonce:ctx.nonce, nc:nc, cnonce:ctx.cnonce, qop:ctx.qop, uri:ctx.uri, entity:rq.content});
 
   var signature = {
     scheme: 'Digest',
@@ -229,7 +235,7 @@ exports.signRequest = function (ctx, rq, rs, creds) {
     cnonce: q(ctx.cnonce),
     qop: ctx.qop,
     opaque: q(ctx.opaque),
-    response: q(calculateDigest({ha1:ctx.ha1, method:rq.method, nonce:ctx.nonce, nc:nc, cnonce:ctx.cnonce, qop:ctx.qop, uri:ctx.uri, entity:rq.content}))
+    response: q(ctx.response)
   };
 
   var hname = ctx.proxy ? 'proxy-authorization' : 'authorization';
