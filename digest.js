@@ -108,10 +108,10 @@ function selectQop(challenge, preference) {
 exports.challenge = function(ctx, rs) {
   ctx.proxy = rs.status === 407;
 
-  ctx.nonce = ctx.cnonce || rbytes();
+  ctx.nonce = ctx.nonce || rbytes();
   ctx.nc = 0;
   ctx.qop = ctx.qop || 'auth,auth-int';
-  ctx.algorithm = ctx.algorithm || 'md5';
+  ctx.algorithm = ctx.algorithm || 'MD5';
 
 
   var hname = ctx.proxy ? 'proxy-authenticate' : 'www-authenticate';
