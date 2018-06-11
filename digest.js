@@ -229,13 +229,19 @@ exports.signRequest = function (ctx, rq, rs, creds) {
 
   ctx.response = calculateDigest({ha1:ctx.ha1, method:rq.method, nonce:ctx.nonce, nc:nc, cnonce:ctx.cnonce, qop:ctx.qop, uri:ctx.uri, entity:rq.content});
 
+  signRequestFromContext(ctx, rq);
+
+  return ctx.qop ? ctx : null;
+}
+
+function signRequestFromContext(ctx, rq) {
   var signature = {
     scheme: 'Digest',
     realm: q(ctx.realm),
     username: q(ctx.user),
     nonce: q(ctx.nonce),
     uri: q(ctx.uri),
-    nc: nc,
+    nc: numberTo8Hex(ctx.nc),
     algorithm: AlgorithmProperName[ctx.algorithm] || ctx.algorithm,
     cnonce: q(ctx.cnonce),
     qop: ctx.qop,
@@ -250,6 +256,7 @@ exports.signRequest = function (ctx, rq, rs, creds) {
 
   return ctx.qop ? ctx : null;
 }
+exports.signRequestFromContext = signRequestFromContext;
 
 exports.authenticateResponse = function(ctx, rs) {
   var signature = rs.headers[ctx.proxy ? 'proxy-authentication-info' : 'authentication-info'];
