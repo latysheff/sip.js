@@ -223,11 +223,11 @@ exports.signRequest = function (ctx, rq, rs, creds) {
   if(rs)
     if (!initClientContext(ctx, rs, creds)) return;
 
-  var nc = ctx.nc !== undefined ? numberTo8Hex(++ctx.nc) : undefined;
+  ctx.ncHex = ctx.nc !== undefined ? numberTo8Hex(++ctx.nc) : undefined;
 
   ctx.uri = stringifyUri(rq.uri);
 
-  ctx.response = calculateDigest({ha1:ctx.ha1, method:rq.method, nonce:ctx.nonce, nc:nc, cnonce:ctx.cnonce, qop:ctx.qop, uri:ctx.uri, entity:rq.content});
+  ctx.response = calculateDigest({ha1:ctx.ha1, method:rq.method, nonce:ctx.nonce, nc:ctx.ncHex, cnonce:ctx.cnonce, qop:ctx.qop, uri:ctx.uri, entity:rq.content});
 
   signRequestFromContext(ctx, rq);
 
@@ -241,7 +241,7 @@ function signRequestFromContext(ctx, rq) {
     username: q(ctx.user),
     nonce: q(ctx.nonce),
     uri: q(ctx.uri),
-    nc: numberTo8Hex(ctx.nc),
+    nc: ctx.ncHex,
     algorithm: AlgorithmProperName[ctx.algorithm] || ctx.algorithm,
     cnonce: q(ctx.cnonce),
     qop: ctx.qop,
