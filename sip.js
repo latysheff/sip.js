@@ -140,19 +140,6 @@ function parseAuthenticationInfoHeader(d) {
   return a;
 }
 
-var compactForm = {
-  i: 'call-id',
-  m: 'contact',
-  e: 'contact-encoding',
-  l: 'content-length',
-  c: 'content-type',
-  f: 'from',
-  s: 'subject',
-  k: 'supported',
-  t: 'to',
-  v: 'via'
-};
-
 var parsers = {
   'to': parseAOR,
   'from': parseAOR,
@@ -344,7 +331,7 @@ var stringifiers = {
 };
 
 function prettifyHeaderName(s) {
-  if(s == 'call-id') return 'Call-ID';
+  if(PrettyHeader[s]) return PrettyHeader[s];
 
   return s.replace(/\b([a-z])/g, function(a) { return a.toUpperCase(); });
 }
@@ -1455,3 +1442,139 @@ exports.start = function(options, callback) {
   exports.hostname = r.hostname;
 }
 
+// https://www.iana.org/assignments/sip-parameters/sip-parameters.xhtml#sip-parameters-2
+let Headers = {
+  'Accept': false,
+  'Accept-Contact': 'a',
+  'Accept-Encoding': false,
+  'Accept-Language': false,
+  'Accept-Resource-Priority': false,
+  'Alert-Info': false,
+  'Allow': false,
+  'Allow-Events': 'u',
+  'Answer-Mode': false,
+  'Authentication-Info': false,
+  'Authorization': false,
+  'Call-ID': 'i',
+  'Call-Info': false,
+  'Cellular-Network-Info': false,
+  'Contact': 'm',
+  'Content-Disposition': false,
+  'Content-Encoding': 'e',
+  'Content-ID': false,
+  'Content-Language': false,
+  'Content-Length': 'l',
+  'Content-Type': 'c',
+  'CSeq': false,
+  'Date': false,
+  'Encryption': false,
+  'Error-Info': false,
+  'Event': 'o',
+  'Expires': false,
+  'Feature-Caps': false,
+  'Flow-Timer': false,
+  'From': 'f',
+  'Geolocation': false,
+  'Geolocation-Error': false,
+  'Geolocation-Routing': false,
+  'Hide': false,
+  'History-Info': false,
+  'Identity': 'y',
+  'Identity-Info': false,
+  'Info-Package': false,
+  'In-Reply-To': false,
+  'Join': false,
+  'Max-Breadth': false,
+  'Max-Forwards': false,
+  'MIME-Version': false,
+  'Min-Expires': false,
+  'Min-SE': false,
+  'Organization': false,
+  'P-Access-Network-Info': false,
+  'P-Answer-State': false,
+  'P-Asserted-Identity': false,
+  'P-Asserted-Service': false,
+  'P-Associated-URI': false,
+  'P-Called-Party-ID': false,
+  'P-Charging-Function-Addresses': false,
+  'P-Charging-Vector': false,
+  'P-DCS-Trace-Party-ID': false,
+  'P-DCS-OSPS': false,
+  'P-DCS-Billing-Info': false,
+  'P-DCS-LAES': false,
+  'P-DCS-Redirect': false,
+  'P-Early-Media': false,
+  'P-Media-Authorization': false,
+  'P-Preferred-Identity': false,
+  'P-Preferred-Service': false,
+  'P-Private-Network-Indication': false,
+  'P-Profile-Key': false,
+  'P-Refused-URI-List': false,
+  'P-Served-User': false,
+  'P-User-Database': false,
+  'P-Visited-Network-ID': false,
+  'Path': false,
+  'Permission-Missing': false,
+  'Policy-Contact': false,
+  'Policy-ID': false,
+  'Priority': false,
+  'Priv-Answer-Mode': false,
+  'Privacy': false,
+  'Proxy-Authenticate': false,
+  'Proxy-Authorization': false,
+  'Proxy-Require': false,
+  'RAck': false,
+  'Reason': false,
+  'Reason-Phrase': false,
+  'Record-Route': false,
+  'Recv-Info': false,
+  'Refer-Events-At': false,
+  'Refer-Sub': false,
+  'Refer-To': 'r',
+  'Referred-By': 'b',
+  'Reject-Contact': 'j',
+  'Relayed-Charge': false,
+  'Replaces': false,
+  'Reply-To': false,
+  'Request-Disposition': 'd',
+  'Require': false,
+  'Resource-Priority': false,
+  'Resource-Share': false,
+  'Response-Key': false,
+  'Restoration-Info': false,
+  'Retry-After': false,
+  'Route': false,
+  'RSeq': false,
+  'Security-Client': false,
+  'Security-Server': false,
+  'Security-Verify': false,
+  'Server': false,
+  'Service-Route': false,
+  'Session-Expires': 'x',
+  'Session-ID': false,
+  'SIP-ETag': false,
+  'SIP-If-Match': false,
+  'Subject': 's',
+  'Subscription-State': false,
+  'Supported': 'k',
+  'Suppress-If-Match': false,
+  'Target-Dialog': false,
+  'Timestamp': false,
+  'To': 't',
+  'Trigger-Consent': false,
+  'Unsupported': false,
+  'User-Agent': false,
+  'User-to-User': false,
+  'Via': 'v',
+  'Warning': false,
+  'WWW-Authenticate': false
+}
+
+let CompactForm = {}
+let compactForm = CompactForm
+let PrettyHeader = {}
+for (let name in Headers) {
+  PrettyHeader[name.toLowerCase()] = name
+  if (Headers[name])
+    CompactForm[Headers[name]] = name.toLowerCase()
+}
