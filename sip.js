@@ -375,7 +375,10 @@ function makeResponse(rq, status, reason, extension) {
   };
 
   if(extension) {
-    if(extension.headers) Object.keys(extension.headers).forEach(function(h) { rs.headers[h] = extension.headers[h]; });
+    if(extension.headers) Object.keys(extension.headers).forEach(function(h) {
+      if(rs.headers[h]) return
+      rs.headers[h] = extension.headers[h];
+    });
     rs.content = extension.content;
   }
 
