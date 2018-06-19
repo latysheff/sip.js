@@ -1303,7 +1303,7 @@ function sequentialSearch(transaction, connect, addresses, rq, callback) {
 exports.create = function(options, callback) {
   var errorLog = (options.logger && options.logger.error) || function() {};
 
-  var transport = makeTransport(options, function(m,remote) {
+  var transport = makeTransport(options, function(m,remote,stream) {
     try {
       var t = m.method ? transaction.getServer(m) : transaction.getClient(m);
 
@@ -1311,14 +1311,14 @@ exports.create = function(options, callback) {
         if(m.method && m.method !== 'ACK') {
           var t = transaction.createServerTransaction(m, transport.get(remote));
           try {
-            callback(m,remote);
+            callback(m,remote,stream);
           } catch(e) {
             t.send(makeResponse(m, '500', 'Internal Server Error'));
             throw e;
           }
         }
         else if(m.method === 'ACK') {
-          callback(m,remote);
+          callback(m,remote,stream);
         }
       }
       else {
