@@ -200,6 +200,8 @@ function parse(data) {
   return m;
 }
 
+exports.parseHeaders = parse;
+
 function parseUri(s) {
   if(typeof s === 'object')
     return s;

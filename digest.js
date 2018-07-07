@@ -108,6 +108,7 @@ function selectQop(challenge, preference) {
 
   throw new Error('failed to negotiate protection quality');
 }
+exports.selectQop = selectQop;
 
 var AlgorithmProperName = {
   'md5': 'MD5',
