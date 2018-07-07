@@ -1382,7 +1382,7 @@ exports.create = function(options, callback) {
 
         if(m.headers.route && m.headers.route.length > 0) {
           hop = parseUri(m.headers.route[0].uri);
-          if(hop.host === hostname) {
+          if(hop.host === hostname || hop.params.remove) {
             m.headers.route.shift();
           }
           else if(hop.params.lr === undefined ) {
