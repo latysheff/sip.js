@@ -1382,13 +1382,16 @@ exports.create = function(options, callback) {
 
         if(m.headers.route && m.headers.route.length > 0) {
           hop = parseUri(m.headers.route[0].uri);
-          if(hop.host === hostname || hop.params.remove) {
+          if(hop.host === hostname) {
             m.headers.route.shift();
           }
           else if(hop.params.lr === undefined ) {
             m.headers.route.shift();
             m.headers.route.push({uri: m.uri});
             m.uri = hop;
+          }
+          else if(hop.params.lr === 'remove') {
+            m.headers.route.shift();
           }
         }
 
