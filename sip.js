@@ -243,6 +243,8 @@ function stringifyParams(params) {
   return s;
 }
 
+exports.stringifyParams = stringifyParams;
+
 function stringifyUri(uri) {
   if(typeof uri === 'string')
     return uri;
@@ -277,6 +279,8 @@ exports.stringifyUri = stringifyUri;
 function stringifyAOR(aor) {
   return (aor.name || '') + ' <' + stringifyUri(aor.uri) + '>'+stringifyParams(aor.params);
 }
+
+exports.stringifyAOR = stringifyAOR;
 
 function stringifyAuthHeader(a) {
   var s = [];
@@ -639,7 +643,8 @@ function makeTlsTransport(options, callback) {
     function(port, host, callback) { return tls.connect(port, host, options.tls, callback); },
     function(callback) {
       var server = tls.createServer(options.tls, callback);
-      server.listen(options.tls_port || 5061, options.address);
+      if (options.listen === undefined || options.listen )
+        server.listen(options.tls_port || 5061, options.address);
       return server;
     },
     callback);
@@ -653,7 +658,8 @@ function makeTcpTransport(options, callback) {
     function(port, host, callback) { return net.connect(port, host, callback); },
     function(callback) {
       var server = net.createServer(callback);
-      server.listen(options.port || 5060, options.address);
+      if (options.listen === undefined || options.listen )
+        server.listen(options.port || 5060, options.address);
       return server;
     },
     callback);
