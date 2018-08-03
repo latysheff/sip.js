@@ -237,7 +237,7 @@ function stringifyParams(params) {
   var s = '';
   for(var n in params) {
     if (Array.isArray(params[n])) {params[n].forEach(p=>{s += ';'+n+"="+p})} else
-    s += ';'+n+(params[n]?'='+params[n]:'');
+      s += ';'+n+(params[n]?'='+params[n]:'');
   }
 
   return s;
@@ -1012,10 +1012,12 @@ function createInviteServerTransaction(transport, cleanup) {
   var g, h;
   var completed = {
     enter: function () {
-      g = setTimeout(function retry(t) {
-        g = setTimeout(retry, Math.min(t*2,T2), Math.min(t*2,T2));
-        transport(rs)
-      }, TIMER_G, TIMER_G);
+      if(!transport.reliable) {
+        g = setTimeout(function retry(t) {
+          g = setTimeout(retry, Math.min(t * 2, T2), Math.min(t * 2, T2));
+          transport(rs)
+        }, TIMER_G, TIMER_G);
+      }
       h = setTimeout(sm.enter.bind(sm, terminated), TIMER_H);
     },
     leave: function() {
@@ -1032,7 +1034,7 @@ function createInviteServerTransaction(transport, cleanup) {
 
   var timer_i;
   var confirmed = {
-    enter: function() { timer_i = setTimeout(sm.enter.bind(sm, terminated), TIMER_I);},
+    enter: function() { timer_i = setTimeout(sm.enter.bind(sm, terminated), transport.reliable ? 0 : TIMER_I);},
     leave: function() { clearTimeout(timer_i); }
   };
 
@@ -1069,7 +1071,7 @@ function createServerTransaction(transport, cleanup) {
   var j;
   var completed = {
     message: function() { transport(rs); },
-    enter: function() { j = setTimeout(function() { sm.enter(terminated); }, TIMER_J); },
+    enter: function() { j = setTimeout(function() { sm.enter(terminated); }, transport.reliable ? 0 : TIMER_J); },
     leave: function() { clearTimeout(j); }
   };
 
@@ -1215,7 +1217,7 @@ function createClientTransaction(rq, transport, tu, cleanup) {
 
   var k;
   var completed = {
-    enter: function() { k = setTimeout(function() { sm.enter(terminated); }, TIMER_K); },
+    enter: function() { k = setTimeout(function() { sm.enter(terminated); }, transport.reliable ? 0 : TIMER_K); },
     leave: function() { clearTimeout(k); }
   };
 
